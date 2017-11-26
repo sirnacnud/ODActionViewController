@@ -250,8 +250,8 @@ static CGFloat const kODActionViewControllerItemsFontSize = 14.0f;
     }
 }
 
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
 
     CGFloat newOffset = self.view.bounds.size.height - _tableView.frame.size.height;
     [self setTableOffset:0];
@@ -311,11 +311,17 @@ static CGFloat const kODActionViewControllerItemsFontSize = 14.0f;
 }
 
 - (void)setTableOffset:(CGFloat)offset {
+    CGFloat bottomInset = 0;
+    if (@available(iOS 11.0, *)) {
+        if (offset < 0) {
+            bottomInset += self.view.safeAreaInsets.bottom;
+        }
+    }
     CGRect rc = _tableView.frame;
-    rc.origin.y = offset;
+    rc.origin.y = offset - bottomInset;
     _tableView.frame = rc;
 
-    rc.size.height -= self.view.bounds.size.height;
+    rc.size.height -= self.view.bounds.size.height - bottomInset;
     rc.origin.y += self.view.bounds.size.height;
     _blurredBackground.frame = rc;
 }
